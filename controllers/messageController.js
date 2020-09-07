@@ -1,6 +1,8 @@
 const Message = require('../models/Message');
+const asyncHandler = require('../utils/asyncHandler');
+const ErrorResponse = require('../utils/errorResponse');
 
-const createMessage = async (req, res, next) => {
+const createMessage = asyncHandler(async (req, res, next) => {
   const { message, name } = req.body;
   const timestamp = new Date().toUTCString();
 
@@ -23,27 +25,24 @@ const createMessage = async (req, res, next) => {
     success: true,
     data: newMessage
   });
-};
+});
 
-const getAllMessages = async (req, res, next) => {
+const getAllMessages = asyncHandler(async (req, res, next) => {
   const messages = await Message.find();
   res.status(200).json({
     success: true,
     length: messages.length,
     data: messages
   });
-};
+});
 
-const deleteMessageById = async (req, res, next) => {
+const deleteMessageById = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
   const message = await Message.findById(id);
 
   if (!message) {
-    res.status(500).json({
-      success: false,
-      error: `Message with id:${id} does not exist`
-    });
+    return next(new ErrorResponse(`Resource not found with id of: ${id}`, 404));
   }
 
   await Message.findByIdAndDelete(id);
@@ -52,16 +51,16 @@ const deleteMessageById = async (req, res, next) => {
     success: true,
     data: message
   });
-};
+});
 
-const deleteAllMessages = async (req, res, next) => {
-  const messages = await Message.deleteMany();
+const deleteAllMessages = asyncHandler(async (req, res, next) => {
+  await Message.deleteMany();
   res.status(200).json({
     success: true,
     length: 0,
     data: []
   });
-};
+});
 
 module.exports = {
   createMessage,
