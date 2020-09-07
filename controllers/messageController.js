@@ -4,7 +4,7 @@ const ErrorResponse = require('../utils/errorResponse');
 
 const createMessage = asyncHandler(async (req, res, next) => {
   const { message, name } = req.body;
-  const timestamp = new Date().toUTCString();
+  // const timestamp = new Date().toUTCString();
 
   if (!message || !name) {
     res.status(500).json({
@@ -13,7 +13,7 @@ const createMessage = asyncHandler(async (req, res, next) => {
     });
   }
 
-  const newMessage = await Message.create({ message, name, timestamp });
+  const newMessage = await Message.create({ message, name });
 
   if (!newMessage) {
     res.status(500).json({
