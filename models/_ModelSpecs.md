@@ -21,4 +21,4 @@ Messages
 
 - message: String
 - name: String
-- timestamp: String
+- createdAt: Date

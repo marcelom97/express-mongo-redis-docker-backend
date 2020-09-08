@@ -9,9 +9,9 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a name']
   },
-  timestamp: {
-    type: String,
-    default: new Date().toUTCString()
+  createdAt: {
+    type: Date,
+    default: Date.now()
   }
 });
 
