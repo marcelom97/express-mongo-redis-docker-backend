@@ -13,6 +13,7 @@ dotenv.config({ path: './config/config.env' });
 // Importing Routes
 const messageRouter = require('./routes/messageRouter');
 const userRouter = require('./routes/userRouter');
+const authRouter = require('./routes/authRouter');
 
 const app = express();
 connectDB();
@@ -24,6 +25,7 @@ app.use(morgan('dev'));
 // Mount routes
 app.use('/api/v1/message', messageRouter);
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/auth', authRouter);
 
 // Error handler middleware
 app.use(errorHandler);

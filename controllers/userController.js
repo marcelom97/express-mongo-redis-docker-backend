@@ -23,7 +23,7 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find();
 
   if (!users) {
-    next(new ErrorResponse('List of Users not found', 404));
+    return next(new ErrorResponse('List of Users not found', 404));
   }
 
   res.status(200).json({
@@ -37,7 +37,7 @@ const getUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    next(
+    return next(
       new ErrorResponse(
         `Resource not found with the id of:${req.params.id}`,
         404
@@ -55,7 +55,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   let user = await User.findById(req.params.id);
 
   if (!user) {
-    next(
+    return next(
       new ErrorResponse(
         `Resource not found with the id of:${req.params.id}`,
         404
@@ -78,7 +78,7 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    next(
+    return next(
       new ErrorResponse(
         `Resource not found with the id of:${req.params.id}`,
         404
@@ -86,7 +86,7 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  await User.findByIdAndDelete(id);
+  await User.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
