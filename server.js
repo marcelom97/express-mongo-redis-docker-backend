@@ -5,7 +5,7 @@ const { json } = require('body-parser');
 const errorHandler = require('./middlewares/errorHandler');
 const morgan = require('morgan');
 const { yellow, bold, blue } = require('colors');
-const socket = require('socket.io');
+const cookieParser = require('cookie-parser');
 
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
@@ -14,50 +14,29 @@ dotenv.config({ path: './config/config.env' });
 const messageRouter = require('./routes/messageRouter');
 const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
+const roomsRouter = require('./routes/roomsRouter');
 
 const app = express();
 connectDB();
 
 // Mount middlewares
+// Needed to be able to read body data
 app.use(json());
+// Mount custome logger to Server
 app.use(morgan('dev'));
+// use express middleware for easier cookie handling
+app.use(cookieParser());
 
 // Mount routes
 app.use('/api/v1/message', messageRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/rooms', roomsRouter);
 
 // Error handler middleware
 app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
-const server = app.listen(port, () => {
+app.listen(port, () => {
   console.log(yellow(bold(`Listening on http://localhost:${port}`)));
-});
-
-const io = socket(server);
-
-io.on('connection', function (socket) {
-  console.log(blue('Made socket connection!'));
-
-  socket.on('new user', function (data) {
-    socket.userId = data;
-    // activeUsers.add(data);
-    io.emit('new user', [...activeUsers]);
-  });
-
-  socket.on('join', room => {
-    console.log(`Socket ${socket.id} joining ${room}`);
-    socket.join(room);
-  });
-  socket.on('chat', data => {
-    const { message, room } = data;
-    console.log(`msg: ${message}, room: ${room}`);
-    io.to(room).emit('chat', message);
-  });
-
-  socket.on('disconnect', () => {
-    // activeUsers.delete(socket.userId);
-    io.emit('user disconnected', socket.userId);
-  });
 });
