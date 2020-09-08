@@ -63,7 +63,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
     );
   }
 
-  user = await User.findOneAndUpdate(req.params.id, req.body, {
+  user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   });
