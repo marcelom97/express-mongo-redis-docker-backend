@@ -13,10 +13,6 @@ const createNewUser = asyncHandler(async (req, res, next) => {
     lastname
   });
 
-  if (!user) {
-    return next(new ErrorResponse('User not created', 500));
-  }
-
   res.status(201).json({
     success: true,
     data: user
@@ -26,6 +22,10 @@ const createNewUser = asyncHandler(async (req, res, next) => {
 const getAllUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find();
 
+  if (!users) {
+    next(new ErrorResponse('List of Users not found', 404));
+  }
+
   res.status(200).json({
     success: true,
     length: users.length,
@@ -34,12 +34,15 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
 });
 
 const getUserById = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-
-  const user = await User.findById(id);
+  const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(new ErrorResponse(`User not found with id of: ${id}`, 404));
+    next(
+      new ErrorResponse(
+        `Resource not found with the id of:${req.params.id}`,
+        404
+      )
+    );
   }
 
   res.status(200).json({
@@ -48,4 +51,53 @@ const getUserById = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createNewUser, getUserById, getAllUsers };
+const updateUserById = asyncHandler(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+
+  if (!user) {
+    next(
+      new ErrorResponse(
+        `Resource not found with the id of:${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  user = await User.findOneAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
+const deleteUserById = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    next(
+      new ErrorResponse(
+        `Resource not found with the id of:${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  await User.findByIdAndDelete(id);
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
+module.exports = {
+  createNewUser,
+  getUserById,
+  getAllUsers,
+  deleteUserById,
+  updateUserById
+};
