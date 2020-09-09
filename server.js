@@ -6,7 +6,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const morgan = require('morgan');
 const { yellow, bold, blue } = require('colors');
 const cookieParser = require('cookie-parser');
-
+const cors = require('cors');
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
 
@@ -26,6 +26,8 @@ app.use(json());
 app.use(morgan('dev'));
 // use express middleware for easier cookie handling
 app.use(cookieParser());
+// use cors
+app.use(cors());
 
 // Mount routes
 app.use('/api/v1/message', messageRouter);
