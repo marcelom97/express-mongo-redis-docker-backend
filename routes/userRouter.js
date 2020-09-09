@@ -9,7 +9,11 @@ const {
   updateUserById
 } = require('../controllers/userController');
 
-router.route('/').post(createNewUser).get(getAllUsers);
+const User = require('../models/User');
+
+const advancedResults = require('../middlewares/advancedResults');
+
+router.route('/').post(createNewUser).get(advancedResults(User), getAllUsers);
 
 router
   .route('/:id')

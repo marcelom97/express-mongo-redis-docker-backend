@@ -15,6 +15,7 @@ const messageRouter = require('./routes/messageRouter');
 const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
 const roomsRouter = require('./routes/roomsRouter');
+const servicesRouter = require('./routes/servicesRouter');
 
 const app = express();
 connectDB();
@@ -34,6 +35,7 @@ app.use('/api/v1/message', messageRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/rooms', roomsRouter);
+app.use('/api/v1/service', servicesRouter);
 
 // Error handler middleware
 app.use(errorHandler);
