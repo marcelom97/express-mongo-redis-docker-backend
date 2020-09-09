@@ -6,12 +6,17 @@ const MessageSchema = new mongoose.Schema({
     required: [true, 'Please provide a message body']
   },
   name: {
-    type: String,
-    required: [true, 'Please provide a name']
+    type: String
   },
   createdAt: {
     type: Date,
     default: Date.now()
+  },
+  room: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Rooms',
+    required: true,
+    select: '_id'
   }
 });
 

@@ -1,19 +1,33 @@
 const Message = require('../models/Message');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const User = require('../models/User');
+const Rooms = require('../models/Rooms');
 
 const createMessage = asyncHandler(async (req, res, next) => {
-  const { message, name } = req.body;
-  // const timestamp = new Date().toUTCString();
+  const { message } = req.body;
+  const name = req.user.username;
 
-  if (!message || !name) {
+  const room = await Rooms.findById(req.params.roomId);
+  const user = await User.findById(req.user.id);
+
+  if (!room.users.includes(user.id)) {
+    return next(
+      new ErrorResponse(
+        `User with id: ${req.user.id} is not authorized to modify this room`,
+        401
+      )
+    );
+  }
+
+  if (!message) {
     res.status(500).json({
       success: false,
       error: 'Something is missing'
     });
   }
 
-  const newMessage = await Message.create({ message, name });
+  const newMessage = await Message.create({ message, name, room });
 
   if (!newMessage) {
     res.status(500).json({
@@ -29,11 +43,23 @@ const createMessage = asyncHandler(async (req, res, next) => {
 
 const getAllMessages = asyncHandler(async (req, res, next) => {
   const messages = await Message.find();
-  res.status(200).json({
-    success: true,
-    length: messages.length,
-    data: messages
-  });
+  // res.status(200).json({
+  //   success: true,
+  //   length: messages.length,
+  //   data: messages
+  // });
+  res.status(200).json(res.advancedResults);
+});
+
+const getAllRoomMessages = asyncHandler(async (req, res, next) => {
+  const messages = await Message.find({ room: req.params.roomId });
+
+  // res.status(200).json({
+  //   success: true,
+  //   length: messages.length,
+  //   data: messages
+  // });
+  res.status(200).json(res.advancedResults);
 });
 
 const deleteMessageById = asyncHandler(async (req, res, next) => {
@@ -66,5 +92,6 @@ module.exports = {
   createMessage,
   getAllMessages,
   deleteMessageById,
-  deleteAllMessages
+  deleteAllMessages,
+  getAllRoomMessages
 };
