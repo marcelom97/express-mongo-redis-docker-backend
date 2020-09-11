@@ -3,6 +3,21 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
 const registerUser = asyncHandler(async (req, res, next) => {
+  const { username, email } = req.body;
+
+  const usernameCheck = await User.find({ username });
+  const emailCheck = await User.find({ email });
+
+  const errors = [];
+
+  if (usernameCheck !== 0) {
+    errors.push({ username: true });
+  }
+
+  if (emailCheck !== 0) {
+    errors.push({ email: true });
+  }
+
   const user = await User.create(req.body);
 
   sendTokenResponse(user, 200, res);
