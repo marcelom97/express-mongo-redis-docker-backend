@@ -4,6 +4,12 @@ const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
 const crypto = require('crypto');
 
+/**
+ * @description Register new User
+ * @method      POST
+ * @route       /api/v1/auth/register
+ * @access      Public
+ */
 const registerUser = asyncHandler(async (req, res, next) => {
   const { username, email } = req.body;
 
@@ -25,6 +31,12 @@ const registerUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @description Login User
+ * @method      POST
+ * @route       /api/v1/auth/login
+ * @access      Public
+ */
 const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -52,6 +64,12 @@ const loginUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @description Logout User / Clear cookie
+ * @method      GET
+ * @route       /api/v1/auth/logout
+ * @access      Private
+ */
 const logoutUser = asyncHandler(async (req, res, next) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
@@ -64,6 +82,12 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+/**
+ * @description Get current logged in User
+ * @method      Get
+ * @route       /api/v1/auth/currentuser
+ * @access      Private
+ */
 const getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -73,6 +97,12 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+/**
+ * @description Forgot User Password
+ * @method      POST
+ * @route       /api/v1/auth/forgotpassword
+ * @access      Public
+ */
 const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -111,6 +141,12 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   }
 });
 
+/**
+ * @description Reset User password
+ * @method      PUT
+ * @route       /api/v1/auth/resetpassword/:resettoken
+ * @access      Public
+ */
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
   const resetPasswordToken = crypto
@@ -136,6 +172,12 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @description Update User password
+ * @method      PUT
+ * @route       /api/v1/auth/updatepassword
+ * @access      Private
+ */
 const updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
@@ -150,6 +192,7 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+// Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();

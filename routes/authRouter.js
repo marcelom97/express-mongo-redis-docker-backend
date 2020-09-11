@@ -16,8 +16,8 @@ router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);
 router.route('/logout').get(protectRoute, logoutUser);
 router.route('/currentuser').get(protectRoute, getCurrentUser);
-router.put('/updatepassword', protectRoute, updatePassword);
-router.post('/forgotpassword', forgotPassword);
-router.put('/resetpassword/:resettoken', resetPassword);
+router.route('/updatepassword').put(protectRoute, updatePassword);
+router.route('/forgotpassword').post(forgotPassword);
+router.route('/resetpassword/:resettoken').put(resetPassword);
 
 module.exports = router;
