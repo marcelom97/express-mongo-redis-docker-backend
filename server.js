@@ -1,8 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./config/connectDB');
 const { json } = require('body-parser');
-const errorHandler = require('./middlewares/errorHandler');
 const morgan = require('morgan');
 const { yellow, bold, red } = require('colors');
 const cookieParser = require('cookie-parser');
@@ -11,7 +9,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xXssProtection = require('x-xss-protection');
 const hpp = require('hpp');
-const cookieSession = require('cookie-session');
+
+const connectDB = require('./config/connectDB');
+const errorHandler = require('./middlewares/errorHandler');
 
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
@@ -42,7 +42,7 @@ app.use(
   cors({
     origin: 'http://localhost:3000',
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-    credentials: true
+    credentials: true,
   })
 );
 app.use(mongoSanitize());
@@ -66,6 +66,6 @@ app.listen(port, () => {
 });
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on('unhandledRejection', (err) => {
   console.log(red(`Error: ${err.message}`));
 });

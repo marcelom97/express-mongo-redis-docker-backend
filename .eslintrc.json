@@ -1,0 +1,21 @@
+{
+  "env": {
+    "es2020": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "no-console": "off"
+  }
+}
