@@ -1,10 +1,9 @@
 {
   "env": {
-    "es2020": true,
+    // "es2020": true,
     "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 11,
     "sourceType": "module"
   },
   "extends": ["airbnb", "prettier"],
@@ -16,6 +15,12 @@
         "endOfLine": "auto"
       }
     ],
-    "no-console": "off"
+    "no-console": "off",
+    "consistent-return": "off",
+    "prefer-destructuring": ["error", { "object": true, "array": false }],
+    "func-names": "off",
+    "no-useless-escape": "off",
+    "no-return-await": "off",
+    "no-underscore-dangle": "off"
   }
 }

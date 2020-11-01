@@ -1,8 +1,29 @@
+const crypto = require('crypto');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
-const crypto = require('crypto');
+
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  // Create token
+  const token = user.getSignedJwtToken();
+
+  const options = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: false
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true;
+  }
+
+  res.status(statusCode).cookie('token', token, options).json({
+    success: true,
+    token
+  });
+};
 
 /**
  * @description Register new User
@@ -10,7 +31,7 @@ const crypto = require('crypto');
  * @route       /api/v1/auth/register
  * @access      Public
  */
-const registerUser = asyncHandler(async (req, res, next) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { username, email } = req.body;
 
   const usernameCheck = await User.find({ username });
@@ -42,9 +63,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   // Validate email & password
   if (!email || !password) {
-    return next(
-      new ErrorResponse('Please provide an email and a password', 400)
-    );
+    return next(new ErrorResponse('Please provide an email and a password', 400));
   }
 
   // Check for User
@@ -70,7 +89,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
  * @route       /api/v1/auth/logout
  * @access      Private
  */
-const logoutUser = asyncHandler(async (req, res, next) => {
+const logoutUser = asyncHandler(async (req, res) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
@@ -88,7 +107,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
  * @route       /api/v1/auth/currentuser
  * @access      Private
  */
-const getCurrentUser = asyncHandler(async (req, res, next) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
 
   res.status(200).json({
@@ -147,10 +166,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
  */
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
-  const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(req.params.resettoken)
-    .digest('hex');
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken,
@@ -189,29 +205,6 @@ const updatePassword = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res);
 });
-
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
-  const token = user.getSignedJwtToken();
-
-  const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    options.secure = true;
-  }
-
-  res.status(statusCode).cookie('token', token, options).json({
-    success: true,
-    token
-  });
-};
 
 module.exports = {
   registerUser,

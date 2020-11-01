@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 
-const checkUsernameIfExists = asyncHandler(async (req, res, next) => {
+const checkUsernameIfExists = asyncHandler(async (req, res) => {
   const { username } = req.params;
   const users = await User.find({ username });
 

@@ -1,5 +1,4 @@
 const express = require('express');
-const router = express.Router();
 
 const {
   createNewUser,
@@ -13,12 +12,10 @@ const User = require('../models/User');
 
 const advancedResults = require('../middlewares/advancedResults');
 
+const router = express.Router();
+
 router.route('/').post(createNewUser).get(advancedResults(User), getAllUsers);
 
-router
-  .route('/:id')
-  .get(getUserById)
-  .delete(deleteUserById)
-  .put(updateUserById);
+router.route('/:id').get(getUserById).delete(deleteUserById).put(updateUserById);
 
 module.exports = router;
