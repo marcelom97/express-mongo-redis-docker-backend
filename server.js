@@ -1,8 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./config/connectDB');
 const { json } = require('body-parser');
-const errorHandler = require('./middlewares/errorHandler');
 const morgan = require('morgan');
 const { yellow, bold, red } = require('colors');
 const cookieParser = require('cookie-parser');
@@ -11,6 +9,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xXssProtection = require('x-xss-protection');
 const hpp = require('hpp');
+
+const connectDB = require('./config/connectDB');
+const errorHandler = require('./middlewares/errorHandler');
 
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
@@ -65,6 +66,6 @@ app.listen(port, () => {
 });
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on('unhandledRejection', (err) => {
   console.log(red(`Error: ${err.message}`));
 });

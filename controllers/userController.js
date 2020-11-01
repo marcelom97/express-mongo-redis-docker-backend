@@ -2,7 +2,7 @@ const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-const createNewUser = asyncHandler(async (req, res, next) => {
+const createNewUser = asyncHandler(async (req, res) => {
   const { username, email, password, firstname, lastname } = req.body;
 
   const user = await User.create({
@@ -26,11 +26,6 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('List of Users not found', 404));
   }
 
-  // res.status(200).json({
-  //   success: true,
-  //   length: users.length,
-  //   data: users
-  // });
   res.status(200).json(res.advancedResults);
 });
 
@@ -38,12 +33,7 @@ const getUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   res.status(200).json({
@@ -56,12 +46,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   let user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   user = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -79,12 +64,7 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   await User.findByIdAndDelete(req.params.id);

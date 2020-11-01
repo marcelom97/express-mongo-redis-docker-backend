@@ -12,12 +12,7 @@ const createMessage = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   if (!room.users.includes(user.id)) {
-    return next(
-      new ErrorResponse(
-        `User with id: ${req.user.id} is not authorized to modify this room`,
-        401
-      )
-    );
+    return next(new ErrorResponse(`User with id: ${req.user.id} is not authorized to modify this room`, 401));
   }
 
   if (!message) {
@@ -41,24 +36,11 @@ const createMessage = asyncHandler(async (req, res, next) => {
   });
 });
 
-const getAllMessages = asyncHandler(async (req, res, next) => {
-  const messages = await Message.find();
-  // res.status(200).json({
-  //   success: true,
-  //   length: messages.length,
-  //   data: messages
-  // });
+const getAllMessages = asyncHandler(async (req, res) => {
   res.status(200).json(res.advancedResults);
 });
 
-const getAllRoomMessages = asyncHandler(async (req, res, next) => {
-  const messages = await Message.find({ room: req.params.roomId });
-
-  // res.status(200).json({
-  //   success: true,
-  //   length: messages.length,
-  //   data: messages
-  // });
+const getAllRoomMessages = asyncHandler(async (req, res) => {
   res.status(200).json(res.advancedResults);
 });
 
@@ -79,7 +61,7 @@ const deleteMessageById = asyncHandler(async (req, res, next) => {
   });
 });
 
-const deleteAllMessages = asyncHandler(async (req, res, next) => {
+const deleteAllMessages = asyncHandler(async (req, res) => {
   await Message.deleteMany();
   res.status(200).json({
     success: true,
