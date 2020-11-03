@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  server:
+    container_name: node
+    restart: on-failure
+    build: .
+    ports:
+      - '5000:5000'
+    links:
+      - db
+      - redis
+    networks:
+      - backend
+  db:
+    container_name: mongo
+    restart: always
+    image: mongo
+    working_dir: /data
+    ports:
+      - '2717:27017'
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - backend
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    networks:
+      - backend
+    volumes:
+      - redis:/data/
+
+networks:
+  backend:
+
+volumes:
+  mongodata:
+  redis:
