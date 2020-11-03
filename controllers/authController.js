@@ -3,6 +3,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 /**
  * @description Register new User
@@ -190,12 +191,30 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @description Refresh Access and Refresh Token
+ * @method      POST
+ * @route       /api/v1/auth/refresh
+ * @access      Private
+ */
+const refreshAccessToken = asyncHandler(async (req, res, next) => {
+  const refreshToken = req.cookies.refreshToken;
+  try {
+    const refreshDecoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    const user = await User.findById(refreshDecoded.id);
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
+  const refreshToken = user.getRefreshToken();
 
-  const options = {
+  const accessOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000
     ),
@@ -203,14 +222,27 @@ const sendTokenResponse = (user, statusCode, res) => {
     secure: false
   };
 
+  const refreshOptions = {
+    expires: new Date(
+      Date.now() + process.env.REFRESH_EXPIRE + 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: false
+  };
+
   if (process.env.NODE_ENV === 'production') {
-    options.secure = true;
+    accessOptions.secure = true;
   }
 
-  res.status(statusCode).cookie('token', token, options).json({
-    success: true,
-    token
-  });
+  res
+    .status(statusCode)
+    .cookie('token', token, accessOptions)
+    .cookie('refreshToken', refreshToken, refreshOptions)
+    .json({
+      success: true,
+      token,
+      refreshToken
+    });
 };
 
 module.exports = {
@@ -220,5 +252,6 @@ module.exports = {
   getCurrentUser,
   forgotPassword,
   resetPassword,
-  updatePassword
+  updatePassword,
+  refreshAccessToken
 };

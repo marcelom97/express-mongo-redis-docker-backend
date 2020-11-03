@@ -6,6 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 // Protect routes
 const protectRoute = asyncHandler(async (req, res, next) => {
   let token = null;
+  let refreshToken = null;
 
   if (
     req.headers.authorization &&
@@ -13,13 +14,14 @@ const protectRoute = asyncHandler(async (req, res, next) => {
   ) {
     // Set token from Bearer token in header
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.token) {
+  } else if (req.cookies.token && req.cookies.refreshToken) {
     // Set token from cookie
     token = req.cookies.token;
+    refreshToken = req.cookies.refreshToken;
   }
 
   // Make sure token exists
-  if (!token) {
+  if (!token || !refreshToken) {
     return next(
       new ErrorResponse(
         `Not authorized to access route:${req.originalUrl}`,
@@ -30,9 +32,11 @@ const protectRoute = asyncHandler(async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const accessDecoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify refresh token
+    const refreshDecoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
 
-    req.user = await User.findById(decoded.id);
+    req.user = await User.findById(accessDecoded.id);
     next();
   } catch (err) {
     return next(

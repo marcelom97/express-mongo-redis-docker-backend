@@ -25,12 +25,7 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
   if (!users) {
     return next(new ErrorResponse('List of Users not found', 404));
   }
-
-  // res.status(200).json({
-  //   success: true,
-  //   length: users.length,
-  //   data: users
-  // });
+  
   res.status(200).json(res.advancedResults);
 });
 
