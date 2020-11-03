@@ -72,10 +72,15 @@ const loginUser = asyncHandler(async (req, res, next) => {
  * @access      Private
  */
 const logoutUser = asyncHandler(async (req, res, next) => {
-  res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
+  res
+    .cookie('token', 'none', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true
+    })
+    .cookie('refreshToken', 'none', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true
+    });
 
   res.status(200).json({
     success: true,
