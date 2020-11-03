@@ -11,7 +11,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xXssProtection = require('x-xss-protection');
 const hpp = require('hpp');
-const cookieSession = require('cookie-session');
 
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
