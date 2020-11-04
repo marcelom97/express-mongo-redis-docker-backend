@@ -3,21 +3,21 @@ const mongoose = require('mongoose');
 const MessageSchema = new mongoose.Schema({
   message: {
     type: String,
-    required: [true, 'Please provide a message body']
+    required: [true, 'Please provide a message body'],
   },
   name: {
-    type: String
+    type: String,
   },
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
   },
   room: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Rooms',
     required: true,
-    select: '_id'
-  }
+    select: '_id',
+  },
 });
 
 module.exports = mongoose.model('Message', MessageSchema);

@@ -2,7 +2,7 @@ const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-/** @module  UserController **/
+/** @module  UserController */
 
 /**
  * @name        module:UserController#createNewUser
@@ -11,6 +11,7 @@ const ErrorResponse = require('../utils/errorResponse');
  * @path        {POST} /api/v1/user
  */
 const createNewUser = asyncHandler(async (req, res, next) => {
+  /* eslint-disable-next-line */
   const { username, email, password, firstname, lastname } = req.body;
 
   const user = await User.create({
@@ -18,12 +19,12 @@ const createNewUser = asyncHandler(async (req, res, next) => {
     email,
     password,
     firstname,
-    lastname
+    lastname,
   });
 
   res.status(201).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
@@ -53,17 +54,12 @@ const getUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   res.status(200).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
@@ -77,22 +73,17 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   let user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
 
   res.status(200).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
@@ -106,19 +97,14 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(
-      new ErrorResponse(
-        `Resource not found with the id of:${req.params.id}`,
-        404
-      )
-    );
+    return next(new ErrorResponse(`Resource not found with the id of:${req.params.id}`, 404));
   }
 
   await User.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
-    data: {}
+    data: {},
   });
 });
 
@@ -127,5 +113,5 @@ module.exports = {
   getUserById,
   getAllUsers,
   deleteUserById,
-  updateUserById
+  updateUserById,
 };

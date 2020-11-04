@@ -1,11 +1,12 @@
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
+const sendTokenResponse = require('../services/sendTokenResponse');
 
-/** @module  AuthController **/
+/** @module  AuthController */
 
 /**
  * @name        module:AuthController#registerUser
@@ -45,9 +46,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   // Validate email & password
   if (!email || !password) {
-    return next(
-      new ErrorResponse('Please provide an email and a password', 400)
-    );
+    return next(new ErrorResponse('Please provide an email and a password', 400));
   }
 
   // Check for User
@@ -78,16 +77,16 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res
     .cookie('token', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     })
     .cookie('refreshToken', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     });
 
   res.status(200).json({
     success: true,
-    data: {}
+    data: {},
   });
 });
 
@@ -103,7 +102,7 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
@@ -134,7 +133,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: 'Password reset token',
-      message
+      message,
     });
 
     res.status(200).json({ success: true, data: 'Email sent', resetToken });
@@ -157,14 +156,11 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
  */
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
-  const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(req.params.resettoken)
-    .digest('hex');
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() }
+    resetPasswordExpire: { $gt: Date.now() },
   });
 
   if (!user) {
@@ -209,7 +205,7 @@ const updatePassword = asyncHandler(async (req, res, next) => {
  * @auth
  */
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-  const refreshToken = req.cookies.refreshToken;
+  const { refreshToken } = req.cookies;
   try {
     const refreshDecoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
     const user = await User.findById(refreshDecoded.id);
@@ -219,43 +215,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
-  const token = user.getSignedJwtToken();
-  const refreshToken = user.getRefreshToken();
-
-  const accessOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  const refreshOptions = {
-    expires: new Date(
-      Date.now() + process.env.REFRESH_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    accessOptions.secure = true;
-  }
-
-  res
-    .status(statusCode)
-    .cookie('token', token, accessOptions)
-    .cookie('refreshToken', refreshToken, refreshOptions)
-    .json({
-      success: true,
-      token,
-      refreshToken
-    });
-};
-
 module.exports = {
   registerUser,
   loginUser,
@@ -264,5 +223,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   updatePassword,
-  refreshAccessToken
+  refreshAccessToken,
 };

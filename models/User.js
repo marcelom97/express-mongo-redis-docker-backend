@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, 'Please provide a valid username'],
-    unique: true
+    unique: true,
   },
   email: {
     type: String,
@@ -15,34 +15,34 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please add a valid email'
-    ]
+      'Please add a valid email',
+    ],
   },
   password: {
     type: String,
     required: [true, 'Please provide a valid password'],
     minlength: 6,
-    select: false
+    select: false,
   },
   firstname: {
     type: String,
-    required: [true, 'Please provide a valid first name']
+    required: [true, 'Please provide a valid first name'],
   },
   lastname: {
     type: String,
-    required: [true, 'Please provide a valid last name']
+    required: [true, 'Please provide a valid last name'],
   },
   role: {
     type: String,
     enum: ['user', 'admin'],
-    default: 'user'
+    default: 'user',
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
     type: Date,
-    default: Date.now()
-  }
+    default: Date.now(),
+  },
 });
 
 // Encrypt Password using bcrypt
@@ -56,20 +56,23 @@ UserSchema.pre('save', async function (next) {
 
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
+  /* eslint-disable-next-line */
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
 // Sign refresh token and return
 UserSchema.methods.getRefreshToken = function () {
+  /* eslint-disable-next-line */
   return jwt.sign({ id: this._id }, process.env.REFRESH_SECRET, {
-    expiresIn: process.env.REFRESH_EXPIRE
+    expiresIn: process.env.REFRESH_EXPIRE,
   });
 };
 
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function (enteredPassword) {
+  /* eslint-disable-next-line */
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

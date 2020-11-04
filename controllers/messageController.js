@@ -4,7 +4,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Rooms = require('../models/Rooms');
 
-/** @module  MessageController **/
+/** @module  MessageController */
 
 /**
  * @name        module:MessageController#createMessage
@@ -20,18 +20,13 @@ const createMessage = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   if (!room.users.includes(user.id)) {
-    return next(
-      new ErrorResponse(
-        `User with id: ${req.user.id} is not authorized to modify this room`,
-        401
-      )
-    );
+    return next(new ErrorResponse(`User with id: ${req.user.id} is not authorized to modify this room`, 401));
   }
 
   if (!message) {
     res.status(500).json({
       success: false,
-      error: 'Something is missing'
+      error: 'Something is missing',
     });
   }
 
@@ -39,13 +34,13 @@ const createMessage = asyncHandler(async (req, res, next) => {
 
   if (!newMessage) {
     res.status(500).json({
-      success: false
+      success: false,
     });
   }
 
   res.status(201).json({
     success: true,
-    data: newMessage
+    data: newMessage,
   });
 });
 
@@ -95,7 +90,7 @@ const deleteMessageById = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    data: message
+    data: message,
   });
 });
 
@@ -110,7 +105,7 @@ const deleteAllMessages = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     length: 0,
-    data: []
+    data: [],
   });
 });
 
@@ -119,5 +114,5 @@ module.exports = {
   getAllMessages,
   deleteMessageById,
   deleteAllMessages,
-  getAllRoomMessages
+  getAllRoomMessages,
 };
