@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: authController.js</title>
+    <title>JSDoc: Source: controllers/authController.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: authController.js</h1>
+    <h1 class="page-title">Source: controllers/authController.js</h1>
 
     
 
@@ -26,14 +26,15 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const User = require('../models/User');
+            <pre class="prettyprint source linenums"><code>const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
+const sendTokenResponse = require('../services/sendTokenResponse');
 
-/** @module  AuthController **/
+/** @module  AuthController */
 
 /**
  * @name        module:AuthController#registerUser
@@ -73,9 +74,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   // Validate email &amp; password
   if (!email || !password) {
-    return next(
-      new ErrorResponse('Please provide an email and a password', 400)
-    );
+    return next(new ErrorResponse('Please provide an email and a password', 400));
   }
 
   // Check for User
@@ -106,16 +105,16 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res
     .cookie('token', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     })
     .cookie('refreshToken', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     });
 
   res.status(200).json({
     success: true,
-    data: {}
+    data: {},
   });
 });
 
@@ -131,7 +130,7 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
@@ -162,7 +161,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: 'Password reset token',
-      message
+      message,
     });
 
     res.status(200).json({ success: true, data: 'Email sent', resetToken });
@@ -185,14 +184,11 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
  */
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
-  const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(req.params.resettoken)
-    .digest('hex');
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() }
+    resetPasswordExpire: { $gt: Date.now() },
   });
 
   if (!user) {
@@ -237,7 +233,7 @@ const updatePassword = asyncHandler(async (req, res, next) => {
  * @auth
  */
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-  const refreshToken = req.cookies.refreshToken;
+  const { refreshToken } = req.cookies;
   try {
     const refreshDecoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
     const user = await User.findById(refreshDecoded.id);
@@ -247,43 +243,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
-  const token = user.getSignedJwtToken();
-  const refreshToken = user.getRefreshToken();
-
-  const accessOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  const refreshOptions = {
-    expires: new Date(
-      Date.now() + process.env.REFRESH_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    accessOptions.secure = true;
-  }
-
-  res
-    .status(statusCode)
-    .cookie('token', token, accessOptions)
-    .cookie('refreshToken', refreshToken, refreshOptions)
-    .json({
-      success: true,
-      token,
-      refreshToken
-    });
-};
-
 module.exports = {
   registerUser,
   loginUser,
@@ -292,7 +251,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   updatePassword,
-  refreshAccessToken
+  refreshAccessToken,
 };
 </code></pre>
         </article>
@@ -304,13 +263,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AuthController.html">AuthController</a></li><li><a href="module-MessageController.html">MessageController</a></li><li><a href="module-RoomController.html">RoomController</a></li><li><a href="module-UserController.html">UserController</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AuthController.html">AuthController</a></li><li><a href="module-MessageController.html">MessageController</a></li><li><a href="module-RoomController.html">RoomController</a></li><li><a href="module-UserController.html">UserController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#sendTokenResponse">sendTokenResponse</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Nov 04 2020 17:08:52 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Nov 06 2020 00:32:00 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
