@@ -10,6 +10,7 @@ const protectRoute = asyncHandler(async (req, res, next) => {
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     // Set token from Bearer token in header
+    /* eslint-disable-next-line */
     token = req.headers.authorization.split(' ')[1];
   } else if (req.cookies.token && req.cookies.refreshToken) {
     // Set token from cookie
