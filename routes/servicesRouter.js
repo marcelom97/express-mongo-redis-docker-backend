@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const { checkUsernameIfExists } = require('../services/checkUsername');

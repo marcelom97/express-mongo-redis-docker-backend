@@ -1,15 +1,18 @@
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../services/sendConfirmationEmail');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
+const sendTokenResponse = require('../services/sendTokenResponse');
+
+/** @module  AuthController */
 
 /**
+ * @name        module:AuthController#registerUser
+ * @function    registerUser
  * @description Register new User
- * @method      POST
- * @route       /api/v1/auth/register
- * @access      Public
+ * @path        {POST} /api/v1/auth/register
  */
 const registerUser = asyncHandler(async (req, res, next) => {
   const { username, email } = req.body;
@@ -33,19 +36,17 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @name        module:AuthController#loginUser
+ * @function    loginUser
  * @description Login User
- * @method      POST
- * @route       /api/v1/auth/login
- * @access      Public
+ * @path        {POST} /api/v1/auth/login
  */
 const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
   // Validate email & password
   if (!email || !password) {
-    return next(
-      new ErrorResponse('Please provide an email and a password', 400)
-    );
+    return next(new ErrorResponse('Please provide an email and a password', 400));
   }
 
   // Check for User
@@ -66,48 +67,50 @@ const loginUser = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @name        module:AuthController#logoutUser
+ * @function    logoutUser
  * @description Logout User / Clear cookie
- * @method      GET
- * @route       /api/v1/auth/logout
- * @access      Private
+ * @path        {GET} /api/v1/auth/logout
+ * @auth
  */
 const logoutUser = asyncHandler(async (req, res, next) => {
   res
     .cookie('token', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     })
     .cookie('refreshToken', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
     });
 
   res.status(200).json({
     success: true,
-    data: {}
+    data: {},
   });
 });
 
 /**
+ * @name        module:AuthController#getCurrentUser
+ * @function    getCurrentUser
  * @description Get current logged in User
- * @method      Get
- * @route       /api/v1/auth/currentuser
- * @access      Private
+ * @path        {GET} /api/v1/auth/currentuser
+ * @auth
  */
 const getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   res.status(200).json({
     success: true,
-    data: user
+    data: user,
   });
 });
 
 /**
+ * @name        module:AuthController#forgotPassword
+ * @function    forgotPassword
  * @description Forgot User Password
- * @method      POST
- * @route       /api/v1/auth/forgotpassword
- * @access      Public
+ * @path        {POST} /api/v1/auth/forgotpassword
  */
 const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
@@ -130,7 +133,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     await sendEmail({
       email: user.email,
       subject: 'Password reset token',
-      message
+      message,
     });
 
     res.status(200).json({ success: true, data: 'Email sent', resetToken });
@@ -146,21 +149,18 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @name        module:AuthController#resetPassword
+ * @function    resetPassword
  * @description Reset User password
- * @method      PUT
- * @route       /api/v1/auth/resetpassword/:resettoken
- * @access      Public
+ * @route       {PUT} /api/v1/auth/resetpassword/:resettoken
  */
 const resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
-  const resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(req.params.resettoken)
-    .digest('hex');
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() }
+    resetPasswordExpire: { $gt: Date.now() },
   });
 
   if (!user) {
@@ -177,10 +177,11 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @name        module:AuthController#updatePassword
+ * @function    updatePassword
  * @description Update User password
- * @method      PUT
- * @route       /api/v1/auth/updatepassword
- * @access      Private
+ * @path        {PUT} /api/v1/auth/updatepassword
+ * @auth
  */
 const updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
@@ -197,13 +198,14 @@ const updatePassword = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @name        module:AuthController#refreshAccessToken
+ * @function    refreshAccessToken
  * @description Refresh Access and Refresh Token
- * @method      POST
- * @route       /api/v1/auth/refresh
- * @access      Private
+ * @path        {POST} /api/v1/auth/refresh
+ * @auth
  */
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-  const refreshToken = req.cookies.refreshToken;
+  const { refreshToken } = req.cookies;
   try {
     const refreshDecoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
     const user = await User.findById(refreshDecoded.id);
@@ -213,43 +215,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
-  const token = user.getSignedJwtToken();
-  const refreshToken = user.getRefreshToken();
-
-  const accessOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  const refreshOptions = {
-    expires: new Date(
-      Date.now() + process.env.REFRESH_EXPIRE + 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: false
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    accessOptions.secure = true;
-  }
-
-  res
-    .status(statusCode)
-    .cookie('token', token, accessOptions)
-    .cookie('refreshToken', refreshToken, refreshOptions)
-    .json({
-      success: true,
-      token,
-      refreshToken
-    });
-};
-
 module.exports = {
   registerUser,
   loginUser,
@@ -258,5 +223,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   updatePassword,
-  refreshAccessToken
+  refreshAccessToken,
 };

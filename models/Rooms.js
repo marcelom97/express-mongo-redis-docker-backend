@@ -1,24 +1,23 @@
 const mongoose = require('mongoose');
-const User = require('./User');
 
 const RoomsSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please provide a valid Room name']
+    required: [true, 'Please provide a valid Room name'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Please provide a valid Room owner']
+    required: [true, 'Please provide a valid Room owner'],
   },
   users: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'User'
+    ref: 'User',
   },
   createdAt: {
     type: Date,
-    default: Date.now()
-  }
+    default: Date.now(),
+  },
 });
 
 module.exports = mongoose.model('Rooms', RoomsSchema);

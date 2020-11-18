@@ -1,14 +1,16 @@
 const express = require('express');
+
 const router = express.Router();
 
 const {
   createRoom,
   getAllOwnersRooms,
   getRoomsThatUserIsParticipant,
-  updateRoomById
+  updateRoomById,
 } = require('../controllers/roomsController');
 
 const { protectRoute } = require('../middlewares/authHandler');
+
 router.use(protectRoute);
 
 router.route('/').post(createRoom);

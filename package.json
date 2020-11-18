@@ -4,7 +4,9 @@
   "main": "server.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "doc": "jsdoc -d docs --configure jsdoc.conf server.js",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,11 @@
     "x-xss-protection": "^2.0.0"
   },
   "devDependencies": {
+    "eslint": "^7.12.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "jsdoc": "^3.6.6",
+    "jsdoc-http-plugin": "^0.3.2",
     "nodemon": "^2.0.4"
   }
 }

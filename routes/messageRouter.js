@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const {
@@ -6,7 +7,7 @@ const {
   getAllMessages,
   deleteMessageById,
   deleteAllMessages,
-  getAllRoomMessages
+  getAllRoomMessages,
 } = require('../controllers/messageController');
 
 const Message = require('../models/Message');
