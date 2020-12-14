@@ -61,13 +61,6 @@ const getAllMessages = asyncHandler(async (req, res, next) => {
  * @path        {GET} /api/v1/message/:roomId/messages
  */
 const getAllRoomMessages = asyncHandler(async (req, res, next) => {
-  const messages = await Message.find({ room: req.params.roomId });
-
-  // res.status(200).json({
-  //   success: true,
-  //   length: messages.length,
-  //   data: messages
-  // });
   res.status(200).json(res.advancedResults);
 });
 
