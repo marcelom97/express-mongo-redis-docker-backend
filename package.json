@@ -27,6 +27,7 @@
     "mongoose": "^5.10.3",
     "morgan": "^1.10.0",
     "nodemailer": "^6.4.11",
+    "redis": "^3.0.2",
     "x-xss-protection": "^2.0.0"
   },
   "devDependencies": {
