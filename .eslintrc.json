@@ -15,6 +15,10 @@
     "func-names": ["error", "never"],
     "consistent-return": "off",
     "no-console": "off",
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "new-cap": "off",
+    "prefer-spread": "off",
+    "prefer-rest-params": "off",
+    "comma-dangle": "off"
   }
 }
