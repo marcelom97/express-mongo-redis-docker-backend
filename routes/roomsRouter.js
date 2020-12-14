@@ -1,4 +1,5 @@
 const express = require('express');
+const cleanCache = require('../middlewares/cleanCache');
 
 const router = express.Router();
 
@@ -13,9 +14,9 @@ const { protectRoute } = require('../middlewares/authHandler');
 
 router.use(protectRoute);
 
-router.route('/').post(createRoom);
+router.route('/').post(cleanCache, createRoom);
 router.route('/myrooms').get(getAllOwnersRooms);
 router.route('/participaterooms').get(getRoomsThatUserIsParticipant);
-router.route('/:id').put(updateRoomById);
+router.route('/:id').put(cleanCache, updateRoomById);
 
 module.exports = router;
