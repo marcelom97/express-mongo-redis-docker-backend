@@ -12,6 +12,8 @@ const hpp = require('hpp');
 const connectDB = require('./config/connectDB');
 const errorHandler = require('./middlewares/errorHandler');
 
+require('./services/cache');
+
 // Adding environment variables
 dotenv.config({ path: './config/config.env' });
 
