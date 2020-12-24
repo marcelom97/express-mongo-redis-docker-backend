@@ -11,6 +11,10 @@ services:
       - redis
     networks:
       - backend
+    depends_on:
+      - db
+      - redis
+    command: bash -c "/usr/wait-for-it.sh --timeout=0 mongodb:27017 && /usr/wait-for-it.sh --timeout=0 redis:6379 && node server.js"
   db:
     container_name: mongodb
     restart: always
