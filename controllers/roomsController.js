@@ -19,7 +19,6 @@ const createRoom = asyncHandler(async (req, res, next) => {
   const room = await Rooms.create(req.body);
 
   res.status(201).json({
-    success: true,
     data: room,
   });
 });
@@ -35,7 +34,6 @@ const getAllOwnersRooms = asyncHandler(async (req, res, next) => {
   const rooms = await Rooms.find({ owner: req.user.id });
 
   res.status(200).json({
-    success: true,
     length: rooms.length,
     data: rooms,
   });
@@ -52,7 +50,6 @@ const getRoomsThatUserIsParticipant = asyncHandler(async (req, res, next) => {
   const rooms = await Rooms.find({ users: req.user.id });
 
   res.status(200).json({
-    success: true,
     length: rooms.length,
     data: rooms,
   });
@@ -82,7 +79,6 @@ const updateRoomById = asyncHandler(async (req, res, next) => {
   });
 
   res.status(200).json({
-    success: true,
     data: room,
   });
 });

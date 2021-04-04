@@ -23,7 +23,6 @@ const createNewUser = asyncHandler(async (req, res, next) => {
   });
 
   res.status(201).json({
-    success: true,
     data: user,
   });
 });
@@ -58,7 +57,6 @@ const getUserById = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({
-    success: true,
     data: user,
   });
 });
@@ -82,7 +80,6 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   });
 
   res.status(200).json({
-    success: true,
     data: user,
   });
 });
@@ -103,7 +100,6 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
   await User.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
-    success: true,
     data: {},
   });
 });

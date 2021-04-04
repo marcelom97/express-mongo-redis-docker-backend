@@ -25,7 +25,6 @@ const createMessage = asyncHandler(async (req, res, next) => {
 
   if (!message) {
     res.status(500).json({
-      success: false,
       error: 'Something is missing',
     });
   }
@@ -34,12 +33,10 @@ const createMessage = asyncHandler(async (req, res, next) => {
 
   if (!newMessage) {
     res.status(500).json({
-      success: false,
     });
   }
 
   res.status(201).json({
-    success: true,
     data: newMessage,
   });
 });
@@ -82,7 +79,6 @@ const deleteMessageById = asyncHandler(async (req, res, next) => {
   await Message.findByIdAndDelete(id);
 
   res.status(200).json({
-    success: true,
     data: message,
   });
 });
@@ -96,7 +92,6 @@ const deleteMessageById = asyncHandler(async (req, res, next) => {
 const deleteAllMessages = asyncHandler(async (req, res, next) => {
   await Message.deleteMany();
   res.status(200).json({
-    success: true,
     length: 0,
     data: [],
   });

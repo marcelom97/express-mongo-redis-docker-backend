@@ -85,7 +85,6 @@ const logoutUser = asyncHandler(async (req, res, next) => {
     });
 
   res.status(200).json({
-    success: true,
     data: {},
   });
 });
@@ -101,7 +100,6 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   res.status(200).json({
-    success: true,
     data: user,
   });
 });
@@ -136,7 +134,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       message,
     });
 
-    res.status(200).json({ success: true, data: 'Email sent', resetToken });
+    res.status(200).json({ data: 'Email sent', resetToken });
   } catch (err) {
     console.log(err);
     user.resetPasswordToken = undefined;

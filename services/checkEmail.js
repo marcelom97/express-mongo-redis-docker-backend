@@ -6,7 +6,6 @@ const checkEmailIfExists = asyncHandler(async (req, res, next) => {
   const users = await User.find({ email });
 
   res.status(200).json({
-    success: true,
     count: users.length,
   });
 });

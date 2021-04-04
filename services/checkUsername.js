@@ -6,7 +6,6 @@ const checkUsernameIfExists = asyncHandler(async (req, res, next) => {
   const users = await User.find({ username });
 
   res.status(200).json({
-    success: true,
     count: users.length,
   });
 });
